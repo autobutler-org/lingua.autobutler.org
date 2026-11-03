@@ -34,9 +34,8 @@ make fix      # apply lint and format fixes
 
 The playground is a Compiler Explorer layout for the factorial program in the
 compiler's end-to-end tests. Tokens and the AST are stdout from `lingua lex`
-and `lingua parse`. LIR, assembly, and the run trace are captured fixtures.
-None of it is a live compile. Editing the source does not recompile. The
-compiler does not print TIR, so that column says so.
+and `lingua parse`. TIR, LIR, assembly, and the run trace are captured
+fixtures. None of it is a live compile. Editing the source does not recompile.
 
 ## Environment
 

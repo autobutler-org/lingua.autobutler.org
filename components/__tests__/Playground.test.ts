@@ -2,13 +2,10 @@ import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
 import PlaygroundView from "../PlaygroundView.vue";
-import { assembly, ast, lir, runOutput, sampleSource, tokens } from "~/data/sample";
+import { assembly, ast, lir, runOutput, sampleSource, tir, tokens } from "~/data/sample";
 
 const notEmbedded =
   "The in-browser compiler is not embedded yet. This page shows the captured pipeline for the sample program.";
-
-const tirNote =
-  "The typechecker builds TIR, and the interpreter and lingua build both read it. lingua does not print TIR yet.";
 
 function mountPlayground() {
   return mount(PlaygroundView, {
@@ -18,6 +15,7 @@ function mountPlayground() {
       lir,
       runOutput,
       sampleSource,
+      tir,
       tokens,
     },
   });
@@ -58,10 +56,11 @@ describe("Playground", () => {
     expect(wrapper.get("pre").element.textContent).toBe(assembly);
   });
 
-  it("shows the TIR note instead of a dump", async () => {
+  it("shows the captured TIR when that tab is chosen", async () => {
     const wrapper = mountPlayground();
     await tab(wrapper, "TIR").trigger("click");
-    expect(wrapper.get("pre").element.textContent).toBe(tirNote);
+    expect(tir.startsWith("(program\n")).toBe(true);
+    expect(wrapper.get("pre").element.textContent).toBe(tir);
   });
 
   it("replaces the panel when the source changes, and restores tokens for the sample", async () => {

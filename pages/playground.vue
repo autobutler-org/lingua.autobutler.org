@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PlaygroundView from "~/components/PlaygroundView.vue";
 import { playground } from "~/data/copy";
-import { assembly, ast, lir, runOutput, sampleSource, tokens } from "~/data/sample";
+import { assembly, ast, lir, runOutput, sampleSource, tir, tokens } from "~/data/sample";
 
 useSeoMeta({
   title: playground.title,
@@ -16,6 +16,7 @@ useSeoMeta({
     :lir="lir"
     :run-output="runOutput"
     :sample-source="sampleSource"
+    :tir="tir"
     :tokens="tokens"
   />
 </template>

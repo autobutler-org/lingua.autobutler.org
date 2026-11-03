@@ -9,6 +9,7 @@ const props = defineProps<{
   readonly lir: string;
   readonly runOutput: string;
   readonly sampleSource: string;
+  readonly tir: string;
   readonly tokens: string;
 }>();
 
@@ -31,7 +32,7 @@ const matchesSample = computed(() => source.value === props.sampleSource);
 const captured = computed(() => ({
   tokens: props.tokens,
   ast: props.ast,
-  tir: playground.tir,
+  tir: props.tir,
   lir: props.lir,
   assembly: props.assembly,
   run: props.runOutput,

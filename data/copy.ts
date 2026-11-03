@@ -134,7 +134,7 @@ export const pipeline = {
     },
     {
       name: "TIR",
-      body: "The typechecker builds TIR, and lingua does not print it yet.",
+      body: "The typechecker prints the typed IR, with a type on every expression.",
     },
     {
       name: "LIR",
@@ -160,7 +160,6 @@ export const playground = {
   outputLabel: "Compiler output",
   notEmbedded:
     "The in-browser compiler is not embedded yet. This page shows the captured pipeline for the sample program.",
-  tir: "The typechecker builds TIR, and the interpreter and lingua build both read it. lingua does not print TIR yet.",
   runNote:
     "The compiler's interpreter already produces this, in step with the native binary. This page will run edited source once that interpreter is built for the browser.",
 } as const;
