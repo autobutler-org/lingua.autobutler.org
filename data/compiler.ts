@@ -5,7 +5,7 @@
  * `compilerUrl` changes when that file changes. Browsers cache `/lingua.wasm`
  * for ten minutes, so a new page must not request the previous URL.
  */
-export const compilerUrl = "/lingua.wasm?v=2";
+export const compilerUrl = "/lingua.wasm?v=3";
 
 export interface CompilerViews {
   readonly tokens: string;

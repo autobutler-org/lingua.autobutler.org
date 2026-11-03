@@ -161,7 +161,7 @@ export const playground = {
   outputLabel: "Compiler output",
   loading: "Loading the compiler...",
   runNote:
-    "Run is the compiler's interpreter, in step with the native binary. This page does not build the linux/amd64 executable.",
+    "Run is the compiler's interpreter, in step with the native binary. A long main stops after 50,000,000 steps so the page can return; a built binary has no step cap. This page does not build the linux/amd64 executable.",
 } as const;
 
 export const errorPage = {
