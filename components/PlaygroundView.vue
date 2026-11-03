@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 
+import type { CompilerViews } from "~/data/compiler";
 import { playground } from "~/data/copy";
 
 const props = defineProps<{
-  readonly assembly: string;
-  readonly ast: string;
-  readonly lir: string;
-  readonly runOutput: string;
+  readonly compile: (source: string) => CompilerViews;
   readonly sampleSource: string;
-  readonly tir: string;
-  readonly tokens: string;
 }>();
 
 const stages = [
@@ -27,22 +23,25 @@ type StageId = (typeof stages)[number]["id"];
 const source = ref(props.sampleSource);
 const selected = ref<StageId>("tokens");
 
-const matchesSample = computed(() => source.value === props.sampleSource);
+const live = computed((): CompilerViews => {
+  try {
+    return props.compile(source.value);
+  } catch (error: unknown) {
+    const text = error instanceof Error ? error.message : "The compiler failed.";
+    return {
+      tokens: text,
+      ast: text,
+      tir: text,
+      lir: text,
+      assembly: text,
+      run: text,
+    };
+  }
+});
 
-const captured = computed(() => ({
-  tokens: props.tokens,
-  ast: props.ast,
-  tir: props.tir,
-  lir: props.lir,
-  assembly: props.assembly,
-  run: props.runOutput,
-}));
+const panelText = computed(() => live.value[selected.value]);
 
-const panelText = computed(() =>
-  matchesSample.value ? captured.value[selected.value] : playground.notEmbedded
-);
-
-const showRunNote = computed(() => matchesSample.value && selected.value === "run");
+const showRunNote = computed(() => selected.value === "run");
 
 function select(id: StageId): void {
   selected.value = id;

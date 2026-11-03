@@ -33,9 +33,10 @@ make fix      # apply lint and format fixes
 ## Playground
 
 The playground is a Compiler Explorer layout for the factorial program in the
-compiler's end-to-end tests. Tokens and the AST are stdout from `lingua lex`
-and `lingua parse`. TIR, LIR, assembly, and the run trace are captured
-fixtures. None of it is a live compile. Editing the source does not recompile.
+compiler's end-to-end tests. `public/lingua.wasm` is the compiler. Editing the
+source recompiles in the page: tokens, AST, TIR, LIR, amd64 assembly, and the
+interpreter's run. `data/sample.ts` keeps the captured factorial output the
+tests compare against.
 
 ## Environment
 
