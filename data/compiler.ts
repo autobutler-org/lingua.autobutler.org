@@ -1,6 +1,6 @@
 /**
- * The browser compiler. `public/lingua.wasm` is the `lingua-wasm` cdylib:
- * source bytes in, JSON out for module `factorial`.
+ * The browser compiler. `public/lingua.wasm` is the `lingua-wasm` cdylib.
+ * A module key and source go in. JSON for that module comes out.
  */
 
 export interface CompilerViews {
@@ -16,24 +16,32 @@ interface WasmExports {
   readonly memory: WebAssembly.Memory;
   readonly lingua_alloc: (size: number) => number;
   readonly lingua_dealloc: (ptr: number, size: number) => void;
-  readonly lingua_compile: (ptr: number, len: number) => number;
+  readonly lingua_compile_in: (key: number, keyLen: number, src: number, srcLen: number) => number;
   readonly lingua_free: (ptr: number) => void;
 }
 
 export async function loadCompiler(
   bytes: BufferSource
-): Promise<(source: string) => CompilerViews> {
+): Promise<(module: string, source: string) => CompilerViews> {
   const { instance } = await WebAssembly.instantiate(bytes, {});
   const wasm = instance.exports as unknown as WasmExports;
-  return (source: string) => compile(wasm, source);
+  return (module: string, source: string) => compile(wasm, module, source);
 }
 
-function compile(wasm: WasmExports, source: string): CompilerViews {
+function writeBytes(wasm: WasmExports, bytes: Uint8Array): number {
+  const ptr = wasm.lingua_alloc(bytes.length);
+  new Uint8Array(wasm.memory.buffer).set(bytes, ptr);
+  return ptr;
+}
+
+function compile(wasm: WasmExports, module: string, source: string): CompilerViews {
+  const key = new TextEncoder().encode(module);
   const encoded = new TextEncoder().encode(source);
-  const ptr = wasm.lingua_alloc(encoded.length);
-  new Uint8Array(wasm.memory.buffer).set(encoded, ptr);
-  const out = wasm.lingua_compile(ptr, encoded.length);
-  wasm.lingua_dealloc(ptr, encoded.length);
+  const keyPtr = writeBytes(wasm, key);
+  const srcPtr = writeBytes(wasm, encoded);
+  const out = wasm.lingua_compile_in(keyPtr, key.length, srcPtr, encoded.length);
+  wasm.lingua_dealloc(keyPtr, key.length);
+  wasm.lingua_dealloc(srcPtr, encoded.length);
   const view = new DataView(wasm.memory.buffer);
   const length = view.getUint32(out, true);
   const json = new TextDecoder().decode(new Uint8Array(wasm.memory.buffer, out + 4, length));

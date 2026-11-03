@@ -5,6 +5,7 @@ import PlaygroundView from "~/components/PlaygroundView.vue";
 import { loadCompiler, type CompilerViews } from "~/data/compiler";
 import { playground } from "~/data/copy";
 import { assembly, ast, lir, runOutput, sampleSource, tir, tokens } from "~/data/sample";
+import { initialSampleId, samples } from "~/data/samples";
 
 useSeoMeta({
   title: playground.title,
@@ -25,8 +26,8 @@ function pending(): CompilerViews {
   return { tokens: text, ast: text, tir: text, lir: text, assembly: text, run: text };
 }
 
-const compile = shallowRef<(source: string) => CompilerViews>((source) =>
-  source === sampleSource ? captured : pending()
+const compile = shallowRef<(module: string, source: string) => CompilerViews>((module, source) =>
+  module === "factorial" && source === sampleSource ? captured : pending()
 );
 
 onMounted(async () => {
@@ -51,5 +52,5 @@ onMounted(async () => {
 </script>
 
 <template>
-  <PlaygroundView :compile="compile" :sample-source="sampleSource" />
+  <PlaygroundView :compile="compile" :initial-sample-id="initialSampleId" :samples="samples" />
 </template>

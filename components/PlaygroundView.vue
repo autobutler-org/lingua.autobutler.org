@@ -3,10 +3,12 @@ import { computed, ref } from "vue";
 
 import type { CompilerViews } from "~/data/compiler";
 import { playground } from "~/data/copy";
+import type { Sample } from "~/data/samples";
 
 const props = defineProps<{
-  readonly compile: (source: string) => CompilerViews;
-  readonly sampleSource: string;
+  readonly compile: (module: string, source: string) => CompilerViews;
+  readonly initialSampleId: string;
+  readonly samples: readonly Sample[];
 }>();
 
 const stages = [
@@ -20,12 +22,15 @@ const stages = [
 
 type StageId = (typeof stages)[number]["id"];
 
-const source = ref(props.sampleSource);
+const chosen = ref(props.initialSampleId);
+const source = ref(sampleById(props.initialSampleId).source);
 const selected = ref<StageId>("tokens");
+
+const moduleName = computed(() => sampleById(chosen.value).module);
 
 const live = computed((): CompilerViews => {
   try {
-    return props.compile(source.value);
+    return props.compile(moduleName.value, source.value);
   } catch (error: unknown) {
     const text = error instanceof Error ? error.message : "The compiler failed.";
     return {
@@ -46,6 +51,20 @@ const showRunNote = computed(() => selected.value === "run");
 function select(id: StageId): void {
   selected.value = id;
 }
+
+function sampleById(id: string): Sample {
+  const sample = props.samples.find((item) => item.id === id);
+  if (!sample) {
+    throw new Error(`missing sample ${id}`);
+  }
+  return sample;
+}
+
+function onSample(event: Event): void {
+  const id = (event.target as HTMLSelectElement).value;
+  chosen.value = id;
+  source.value = sampleById(id).source;
+}
 </script>
 
 <template>
@@ -53,7 +72,14 @@ function select(id: StageId): void {
     <p class="note">{{ playground.note }}</p>
     <div class="columns">
       <section class="pane source" aria-label="Source">
-        <div class="pane-label">Source</div>
+        <div class="pane-label">
+          <span>Source</span>
+          <select :value="chosen" :aria-label="playground.sampleLabel" @change="onSample">
+            <option v-for="sample in samples" :key="sample.id" :value="sample.id">
+              {{ sample.label }}
+            </option>
+          </select>
+        </div>
         <textarea
           v-model="source"
           spellcheck="false"
@@ -137,12 +163,27 @@ function select(id: StageId): void {
 }
 
 .pane-label {
+  justify-content: space-between;
+  gap: 0.75rem;
   padding: 0 0.9rem;
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   color: var(--color-text-muted);
+}
+
+.pane-label select {
+  max-width: 16rem;
+  height: 1.75rem;
+  padding: 0 0.35rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-canvas);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-small);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .tabs {

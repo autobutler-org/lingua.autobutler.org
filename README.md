@@ -32,11 +32,11 @@ make fix      # apply lint and format fixes
 
 ## Playground
 
-The playground is a Compiler Explorer layout for the factorial program in the
-compiler's end-to-end tests. `public/lingua.wasm` is the compiler. Editing the
-source recompiles in the page: tokens, AST, TIR, LIR, amd64 assembly, and the
-interpreter's run. `data/sample.ts` keeps the captured factorial output the
-tests compare against.
+The playground is a Compiler Explorer layout. The sample menu loads single-file
+programs from the compiler's end-to-end tests, kept in `data/programs/`.
+`public/lingua.wasm` compiles the buffer: tokens, AST, TIR, LIR, amd64
+assembly, and the interpreter's run. `data/sample.ts` keeps the captured
+factorial output the tests compare against.
 
 ## Environment
 
