@@ -154,14 +154,13 @@ export const pipeline = {
 export const playground = {
   title: "Playground — Lingua",
   description:
-    "Captured tokens, AST, LIR, assembly, and run output for the factorial sample. Editing the source does not recompile yet.",
-  note: "Captured from the factorial program in the compiler's end-to-end tests. Editing the source does not recompile yet.",
+    "Tokens, AST, TIR, LIR, assembly, and interpreter output for Lingua source, compiled in the browser.",
+  note: "The sample is the factorial program from the compiler's end-to-end tests. Edits compile in the browser.",
   sourceLabel: "Lingua source",
   outputLabel: "Compiler output",
-  notEmbedded:
-    "The in-browser compiler is not embedded yet. This page shows the captured pipeline for the sample program.",
+  loading: "Loading the compiler...",
   runNote:
-    "The compiler's interpreter already produces this, in step with the native binary. This page will run edited source once that interpreter is built for the browser.",
+    "Run is the compiler's interpreter, in step with the native binary. This page does not build the linux/amd64 executable.",
 } as const;
 
 export const errorPage = {
