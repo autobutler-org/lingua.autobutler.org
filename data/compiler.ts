@@ -1,7 +1,11 @@
 /**
  * The browser compiler. `public/lingua.wasm` is the `lingua-wasm` cdylib.
  * A module key and source go in. JSON for that module comes out.
+ *
+ * `compilerUrl` changes when that file changes. Browsers cache `/lingua.wasm`
+ * for ten minutes, so a new page must not request the previous URL.
  */
+export const compilerUrl = "/lingua.wasm?v=2";
 
 export interface CompilerViews {
   readonly tokens: string;
@@ -25,6 +29,9 @@ export async function loadCompiler(
 ): Promise<(module: string, source: string) => CompilerViews> {
   const { instance } = await WebAssembly.instantiate(bytes, {});
   const wasm = instance.exports as unknown as WasmExports;
+  if (typeof wasm.lingua_compile_in !== "function") {
+    throw new Error("The compiler module is out of date. Reload the page.");
+  }
   return (module: string, source: string) => compile(wasm, module, source);
 }
 

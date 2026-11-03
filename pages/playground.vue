@@ -2,7 +2,7 @@
 import { onMounted, shallowRef } from "vue";
 
 import PlaygroundView from "~/components/PlaygroundView.vue";
-import { loadCompiler, type CompilerViews } from "~/data/compiler";
+import { compilerUrl, loadCompiler, type CompilerViews } from "~/data/compiler";
 import { playground } from "~/data/copy";
 import { assembly, ast, lir, runOutput, sampleSource, tir, tokens } from "~/data/sample";
 import { initialSampleId, samples } from "~/data/samples";
@@ -32,7 +32,7 @@ const compile = shallowRef<(module: string, source: string) => CompilerViews>((m
 
 onMounted(async () => {
   try {
-    const response = await fetch("/lingua.wasm");
+    const response = await fetch(compilerUrl);
     if (!response.ok) {
       throw new Error(`could not load the compiler (${response.status})`);
     }
