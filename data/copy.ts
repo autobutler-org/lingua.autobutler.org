@@ -155,7 +155,8 @@ export const playground = {
   title: "Playground — Lingua",
   description:
     "Tokens, AST, TIR, LIR, assembly, and interpreter output for Lingua source, compiled in the browser.",
-  note: "The sample is the factorial program from the compiler's end-to-end tests. Edits compile in the browser.",
+  note: "Samples are single-file programs from the compiler's end-to-end tests. Edits compile in the browser.",
+  sampleLabel: "Sample program",
   sourceLabel: "Lingua source",
   outputLabel: "Compiler output",
   loading: "Loading the compiler...",

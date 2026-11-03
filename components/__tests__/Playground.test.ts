@@ -5,6 +5,7 @@ import PlaygroundView from "../PlaygroundView.vue";
 import type { CompilerViews } from "~/data/compiler";
 import { playground } from "~/data/copy";
 import { assembly, ast, lir, runOutput, sampleSource, tir, tokens } from "~/data/sample";
+import { initialSampleId, samples } from "~/data/samples";
 
 const captured: CompilerViews = {
   tokens,
@@ -15,11 +16,11 @@ const captured: CompilerViews = {
   run: runOutput,
 };
 
-function viewsFor(source: string): CompilerViews {
-  if (source === sampleSource) {
+function viewsFor(module: string, source: string): CompilerViews {
+  if (module === "factorial" && source === sampleSource) {
     return captured;
   }
-  const text = `compiled:${source}`;
+  const text = `compiled:${module}:${source}`;
   return { tokens: text, ast: text, tir: text, lir: text, assembly: text, run: text };
 }
 
@@ -27,7 +28,8 @@ function mountPlayground() {
   return mount(PlaygroundView, {
     props: {
       compile: viewsFor,
-      sampleSource,
+      initialSampleId,
+      samples,
     },
   });
 }
@@ -78,7 +80,7 @@ describe("Playground", () => {
     const wrapper = mountPlayground();
     const area = wrapper.get("textarea");
     await area.setValue(`${sampleSource}\n`);
-    expect(wrapper.get("pre").element.textContent).toBe(`compiled:${sampleSource}\n`);
+    expect(wrapper.get("pre").element.textContent).toBe(`compiled:factorial:${sampleSource}\n`);
     await area.setValue(sampleSource);
     expect(wrapper.get("pre").element.textContent).toBe(tokens);
   });
@@ -87,10 +89,10 @@ describe("Playground", () => {
     const wrapper = mountPlayground();
     await wrapper.get("textarea").setValue("not the sample");
     await tab(wrapper, "Run").trigger("click");
-    expect(wrapper.get("pre").element.textContent).toBe("compiled:not the sample");
+    expect(wrapper.get("pre").element.textContent).toBe("compiled:factorial:not the sample");
     expect(wrapper.get(".run-note").text()).toBe(playground.runNote);
     await tab(wrapper, "AST").trigger("click");
-    expect(wrapper.get("pre").element.textContent).toBe("compiled:not the sample");
+    expect(wrapper.get("pre").element.textContent).toBe("compiled:factorial:not the sample");
     expect(wrapper.find(".run-note").exists()).toBe(false);
   });
 
@@ -99,5 +101,21 @@ describe("Playground", () => {
     await tab(wrapper, "Run").trigger("click");
     expect(wrapper.get("pre").element.textContent).toBe(runOutput);
     expect(wrapper.get(".run-note").text()).toBe(playground.runNote);
+  });
+
+  it("loads another sample into the buffer and compiles it under that module", async () => {
+    const wrapper = mountPlayground();
+    const select = wrapper.get("select");
+    expect((select.element as HTMLSelectElement).value).toBe("factorial");
+    await select.setValue("hello");
+    const hello = samples.find((sample) => sample.id === "hello");
+    if (!hello) {
+      throw new Error("missing hello");
+    }
+    expect((wrapper.get("textarea").element as HTMLTextAreaElement).value).toBe(hello.source);
+    expect(wrapper.get("pre").element.textContent).toBe(`compiled:hello:${hello.source}`);
+    await select.setValue("factorial");
+    expect((wrapper.get("textarea").element as HTMLTextAreaElement).value).toBe(sampleSource);
+    expect(wrapper.get("pre").element.textContent).toBe(tokens);
   });
 });
